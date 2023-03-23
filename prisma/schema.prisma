@@ -1,0 +1,121 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Observation {
+  id              Int          @id @default(autoincrement())
+  date            DateTime
+  time            DateTime
+  remark          String
+  patient         Patient      @relation(fields: [patient_ssn], references: [ssn])
+  patient_ssn     String
+  hospital        Hospital     @relation(fields: [hospital_id], references: [id])
+  hospital_id     Int
+  practitioner    Practitioner @relation(fields: [practitioner_id], references: [id])
+  practitioner_id Int
+  nurse           Nurse        @relation(fields: [nurse_id], references: [id])
+  nurse_id        Int
+  medication      Medication   @relation(fields: [medication_id], references: [id])
+  medication_id   Int
+}
+
+model Patient {
+  ssn                   String           @id
+  firstName             String
+  lastName              String
+  country               String
+  address1              String
+  address2              String
+  number1               String
+  number2               String
+  sex                   String
+  dob                   DateTime
+  dod                   DateTime?
+  email                 String
+  height                Float
+  weight                Float
+  bloodType             String
+  educationBackground   String
+  occupation            String
+  observations          Observation[]
+  patientHistoryRecords PatientHistory[]
+}
+
+model Hospital {
+  id           Int           @id @default(autoincrement())
+  name         String
+  address      String
+  number       String
+  email        String
+  observations Observation[]
+}
+
+model Practitioner {
+  id                    Int                   @id @default(autoincrement())
+  firstName             String
+  lastName              String
+  address1              String
+  address2              String
+  number1               String
+  number2               String
+  observations          Observation[]
+  practitionerHistories PractitionerHistory[]
+}
+
+model Nurse {
+  id             Int            @id @default(autoincrement())
+  firstName      String
+  lastName       String
+  address1       String
+  address2       String
+  number1        String
+  observations   Observation[]
+  nurseHistories NurseHistory[]
+}
+
+model Medication {
+  id           Int           @id @default(autoincrement())
+  name         String
+  company      String
+  level        String
+  remark       String
+  observations Observation[]
+}
+
+model PatientHistory {
+  id            Int      @id @default(autoincrement())
+  patient       Patient  @relation(fields: [patient_ssn], references: [ssn])
+  patient_ssn   String
+  update_date   DateTime
+  updated_field String
+  old_value     String
+  new_value     String
+}
+
+model PractitionerHistory {
+  id              Int          @id @default(autoincrement())
+  practitioner    Practitioner @relation(fields: [practitioner_id], references: [id])
+  practitioner_id Int
+  update_date     DateTime
+  updated_field   String
+  old_value       String
+  new_value       String
+}
+
+model NurseHistory {
+  id            Int      @id @default(autoincrement())
+  nurse         Nurse    @relation(fields: [nurse_id], references: [id])
+  nurse_id      Int
+  update_date   DateTime
+  updated_field String
+  old_value     String
+  new_value     String
+}
